@@ -1,11 +1,9 @@
 {% extends 'auth_system/base.html' %}
 
-{% block title %}{{ match.home_team.name }} vs {{ match.away_team.name }}{% endblock %}
-
 {% block content %}
 <div class="row">
-    <!-- Sidebar with match list -->
-    <div class="col-md-3 bg-light" style="min-height: 100vh;">
+    <!-- Sidebar with match list (mecze) - powinno być po lewej stronie na komputerze -->
+    <div class="col-md-4 order-1 order-md-0 bg-light" style="min-height: 100vh;">
         <h4 class="pt-4">Mecze</h4>
         <ul class="list-group">
             {% for m in matches %}
@@ -21,12 +19,12 @@
         </ul>
     </div>
 
-    <!-- Main content area -->
-    <div class="col-md-9">
+    <!-- Main content area (zakłady, typowanie wyniku) - powinno być po prawej stronie na komputerze -->
+    <div class="col-md-8 order-0 order-md-1">
         <div class="content p-4">
             <h2>{{ match.home_team.name }} vs {{ match.away_team.name }}</h2>
             <p><strong>Data:</strong> {{ match.date|date:"d M Y, H:i" }}</p>
-            
+
             <h3>Obstaw wynik</h3>
             <form method="POST">
                 {% csrf_token %}
