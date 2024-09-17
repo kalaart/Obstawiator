@@ -1,0 +1,14 @@
+<!-- tournament_detail.html -->
+<h1>{{ tournament.name }}</h1>
+
+<h2>Mecze</h2>
+<ul>
+    {% for match in matches %}
+        <li>
+            <a href="{% url 'place_bet' match.id %}">{{ match.home_team }} vs {{ match.away_team }}</a>
+        </li>
+    {% endfor %}
+</ul>
+
+<a href="{% url 'predict_winner' tournament.id %}">Wytypuj mistrza</a>
+<a href="{% url 'predict_top_scorer' tournament.id %}">Wytypuj króla strzelców</a>

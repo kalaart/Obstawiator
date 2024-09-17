@@ -30,6 +30,7 @@ ALLOWED_HOSTS = [
     '.pythonanywhere.com',
 ]
 
+LOGIN_URL = '/login'
 
 # Application definition
 
@@ -41,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'bets',
+    'auth_system',
 ]
 
 MIDDLEWARE = [

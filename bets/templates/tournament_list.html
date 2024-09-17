@@ -1,0 +1,11 @@
+{% extends 'auth_system/base.html' %}
+{% block content %}
+<h1>Turnieje</h1>
+<ul>
+    {% for tournament in tournaments %}
+        <li>
+            <a href="{% url 'tournament_detail' tournament.id %}">{{ tournament.name }}</a>
+        </li>
+    {% endfor %}
+</ul>
+{% endblock %}

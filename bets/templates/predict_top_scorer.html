@@ -1,0 +1,34 @@
+<h1>Wytypuj króla strzelców turnieju: {{ tournament.name }}</h1>
+
+{% if error_message %}
+    <p style="color: red;">{{ error_message }}</p>
+{% endif %}
+
+<form method="post">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="id_predicted_player">Wybierz zawodnika z listy:</label>
+        {{ form.predicted_player }}
+        {% if form.predicted_player.errors %}
+            <p style="color: red;">{{ form.predicted_player.errors }}</p>
+        {% endif %}
+    </div>
+
+    <div class="form-group">
+        <label for="id_new_player_name">Lub wpisz nowego zawodnika:</label>
+        {{ form.new_player_name }}
+        {% if form.new_player_name.errors %}
+            <p style="color: red;">{{ form.new_player_name.errors }}</p>
+        {% endif %}
+    </div>
+
+    <div class="form-group">
+        <label for="id_team">Wybierz drużynę dla nowego zawodnika:</label>
+        {{ form.team }}
+        {% if form.team.errors %}
+            <p style="color: red;">{{ form.team.errors }}</p>
+        {% endif %}
+    </div>
+
+    <button type="submit" class="btn btn-primary">Zapisz typ</button>
+</form>

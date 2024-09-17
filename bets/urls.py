@@ -1,6 +1,26 @@
 from django.urls import path
-from . import views
+from . import views as bets_views
 
 urlpatterns = [
-    path('', views.index, name='index'),
+    # Lista turniejów
+    path('tournaments/', bets_views.tournament_list, name='tournament_list'),
+    path('', bets_views.tournament_list, name='tournament_list'),
+
+    # Szczegóły turnieju (lista meczów)
+    path('tournament/<int:tournament_id>/', bets_views.tournament_detail, name='tournament_detail'),
+
+    # Obstawianie meczu
+    path('match/<int:match_id>/bet/', bets_views.place_bet, name='place_bet'),
+
+    # Typowanie zwycięzcy turnieju
+    path('tournament/<int:tournament_id>/predict-winner/', bets_views.predict_winner, name='predict_winner'),
+
+    # Typowanie króla strzelców
+    path('tournament/<int:tournament_id>/predict-top-scorer/', bets_views.predict_top_scorer, name='predict_top_scorer'),
+
+    # Zaktualizowanie wyniku meczu
+    path('match/<int:match_id>/update-result/', bets_views.update_match_result, name='update_match_result'),
+
+    # Zakończenie turnieju (podliczenie punktów za mistrza i króla strzelców)
+    path('tournament/<int:tournament_id>/finalize/', bets_views.finalize_tournament, name='finalize_tournament'),
 ]

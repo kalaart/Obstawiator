@@ -1,0 +1,109 @@
+{% extends 'auth_system/base.html' %}
+{% block content %}
+  <div class="container">
+
+        <!-- Nagłówek -->
+        <h1>Obstawianie meczów piłkarskich</h1>
+
+        <!-- Sekcja: Najbliższe mecze -->
+        <div class="section">
+            <h2>Najbliższe mecze</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Drużyna A</th>
+                        <th>Drużyna B</th>
+                        <th>Obstaw</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for match in upcoming_matches %}
+                    <tr>
+                        <td>{{ match.date }}</td>
+                        <td>{{ match.team_a }}</td>
+                        <td>{{ match.team_b }}</td>
+                        <td><button>Obstaw</button></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Sekcja: Wyniki ostatnich meczów -->
+        <div class="section">
+            <h2>Wyniki ostatnich meczów</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Drużyna A</th>
+                        <th>Drużyna B</th>
+                        <th>Wynik</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for match in recent_results %}
+                    <tr>
+                        <td>{{ match.date }}</td>
+                        <td>{{ match.team_a }}</td>
+                        <td>{{ match.team_b }}</td>
+                        <td>{{ match.result }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Sekcja: Ranking użytkowników -->
+        <div class="section">
+            <h2>Ranking użytkowników</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Miejsce</th>
+                        <th>Użytkownik</th>
+                        <th>Punkty</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for rank, user in user_rankings %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ user.user.username }}</td>
+                        <td>{{ user.points }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Sekcja: Ostatnie typy użytkownika -->
+        <div class="section">
+            <h2>Ostatnie typy użytkownika</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Mecz</th>
+                        <th>Twój typ</th>
+                        <th>Wynik</th>
+                        <th>Punkty</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for bet in user_bets %}
+                    <tr>
+                        <td>{{ bet.match.date }}</td>
+                        <td>{{ bet.match.team_a }} vs {{ bet.match.team_b }}</td>
+                        <td>{{ bet.predicted_result }}</td>
+                        <td>{{ bet.match.result }}</td>
+                        <td>{{ bet.points }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+{% endblock %}
