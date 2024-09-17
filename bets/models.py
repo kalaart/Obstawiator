@@ -1,3 +1,5 @@
+import datetime
+
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -34,12 +36,14 @@ class Player(models.Model):
     def __str__(self):
         return f"{self.name} ({self.team.name})"
 
+
 class Player(models.Model):
     name = models.CharField(max_length=100)
     team = models.ForeignKey('Team', on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
+
 
 class Match(models.Model):
     tournament = models.ForeignKey(Tournament, related_name='matches', on_delete=models.CASCADE)
@@ -55,14 +59,20 @@ class Match(models.Model):
         return f"{self.home_team} vs {self.away_team} ({self.tournament.name})"
 
 
+from django.db import models
+from django.contrib.auth.models import User
+
+
 class Bet(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     match = models.ForeignKey(Match, on_delete=models.CASCADE)
-    predicted_home_score = models.IntegerField()
-    predicted_away_score = models.IntegerField()
+    home_score = models.IntegerField()
+    away_score = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Bet by {self.user} on {self.match}"
+        return f"{self.user} - {self.match}: {self.home_score}:{self.away_score}"
 
 
 class UserTournamentScore(models.Model):

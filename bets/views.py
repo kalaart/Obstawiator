@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .forms import BetForm, WinnerPredictionForm, TopScorerPredictionForm
-from .models import Match, Tournament, WinnerPrediction, TopScorerPrediction, Player
+from .models import Match, Tournament, WinnerPrediction, TopScorerPrediction, Player, Bet
 from .utils import update_match_bets, calculate_final_results
 from django.contrib.auth.decorators import login_required
 
@@ -126,3 +126,51 @@ def predict_top_scorer(request, tournament_id):
         form = TopScorerPredictionForm(tournament=tournament)
 
     return render(request, 'predict_top_scorer.html', {'form': form, 'tournament': tournament})
+
+
+def matches_list_view(request):
+    # Pobieramy listę meczów
+    matches = Match.objects.all().order_by('date')
+
+    # Renderujemy szablon z listą meczów
+    return render(request, 'matches_list.html', {'matches': matches})
+
+
+def match_detail_view(request, match_id):
+    match = get_object_or_404(Match, id=match_id)
+
+    # Sprawdzenie, czy użytkownik już obstawił ten mecz
+    existing_bet = Bet.objects.filter(user=request.user, match=match).first()
+
+    if request.method == 'POST':
+        form = BetForm(request.POST)
+        if form.is_valid():
+            # Jeśli użytkownik już obstawił, zaktualizuj zakład
+            if existing_bet:
+                existing_bet.home_score = form.cleaned_data['home_score']
+                existing_bet.away_score = form.cleaned_data['away_score']
+                existing_bet.save()
+            else:
+                # Tworzenie nowego zakładu
+                Bet.objects.create(
+                    user=request.user,
+                    match=match,
+                    home_score=form.cleaned_data['home_score'],
+                    away_score=form.cleaned_data['away_score']
+                )
+            return redirect('match_detail', match_id=match.id)
+
+    else:
+        if existing_bet:
+            form = BetForm(initial={
+                'home_score': existing_bet.home_score,
+                'away_score': existing_bet.away_score
+            })
+        else:
+            form = BetForm()
+
+    return render(request, 'match_detail.html', {
+        'match': match,
+        'form': form,
+        'existing_bet': existing_bet
+    })

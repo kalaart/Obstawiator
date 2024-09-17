@@ -3,14 +3,13 @@ from . import views as bets_views
 
 urlpatterns = [
     # Lista turniejów
-    path('tournaments/', bets_views.tournament_list, name='tournament_list'),
-    path('', bets_views.tournament_list, name='tournament_list'),
+    path('tournaments/', bets_views.matches_list_view, name='tournament_list'),
 
     # Szczegóły turnieju (lista meczów)
     path('tournament/<int:tournament_id>/', bets_views.tournament_detail, name='tournament_detail'),
 
     # Obstawianie meczu
-    path('match/<int:match_id>/bet/', bets_views.place_bet, name='place_bet'),
+    path('match/<int:match_id>/bet/', bets_views.match_detail_view, name='match_detail'),
 
     # Typowanie zwycięzcy turnieju
     path('tournament/<int:tournament_id>/predict-winner/', bets_views.predict_winner, name='predict_winner'),

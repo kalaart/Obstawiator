@@ -2,12 +2,6 @@ from django import forms
 from .models import *
 
 
-class BetForm(forms.ModelForm):
-    class Meta:
-        model = Bet
-        fields = ['predicted_home_score', 'predicted_away_score']
-
-
 class WinnerPredictionForm(forms.ModelForm):
     class Meta:
         model = WinnerPrediction
@@ -59,3 +53,8 @@ class TopScorerPredictionForm(forms.Form):
             raise forms.ValidationError('Musisz wybrać zawodnika z listy lub wpisać nowego zawodnika.')
 
         return cleaned_data
+
+
+class BetForm(forms.Form):
+    home_score = forms.IntegerField(label="Wynik gospodarzy", min_value=0)
+    away_score = forms.IntegerField(label="Wynik gości", min_value=0)

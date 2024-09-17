@@ -9,11 +9,11 @@ def update_match_bets(match):
         user_score, created = UserTournamentScore.objects.get_or_create(user=bet.user, tournament=tournament)
 
         # 1. Punkty za dokładny wynik
-        if bet.predicted_home_score == match.home_score and bet.predicted_away_score == match.away_score:
+        if bet.home_score == match.home_score and bet.away_score == match.away_score:
             user_score.points += tournament.points_for_exact_score
 
         # 2. Punkty za poprawny bilans bramek
-        elif (bet.predicted_home_score - bet.predicted_away_score) == (match.home_score - match.away_score):
+        elif (bet.home_score - bet.away_score) == (match.home_score - match.away_score):
             user_score.points += tournament.points_for_goal_difference
 
         # 3. Punkty za poprawne wytypowanie zwycięzcy meczu
@@ -27,9 +27,9 @@ def update_match_bets(match):
                 match_winner = "draw"
 
             bet_winner = None
-            if bet.predicted_home_score > bet.predicted_away_score:
+            if bet.home_score > bet.away_score:
                 bet_winner = "home"
-            elif bet.predicted_home_score < bet.predicted_away_score:
+            elif bet.home_score < bet.away_score:
                 bet_winner = "away"
             else:
                 bet_winner = "draw"

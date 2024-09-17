@@ -1,0 +1,43 @@
+{% extends 'auth_system/base.html' %}
+
+{% block title %}{{ match.home_team.name }} vs {{ match.away_team.name }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Sidebar with match list -->
+    <div class="col-md-3 bg-light" style="min-height: 100vh;">
+        <h4 class="pt-4">Mecze</h4>
+        <ul class="list-group">
+            {% for m in matches %}
+            <li class="list-group-item">
+                <a href="{% url 'match_detail' m.id %}">
+                    <strong>{{ m.home_team.name }}</strong> vs <strong>{{ m.away_team.name }}</strong><br>
+                    <small>{{ m.date|date:"d M Y, H:i" }}</small>
+                </a>
+            </li>
+            {% empty %}
+            <li class="list-group-item">Brak dostępnych meczów</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Main content area -->
+    <div class="col-md-9">
+        <div class="content p-4">
+            <h2>{{ match.home_team.name }} vs {{ match.away_team.name }}</h2>
+            <p><strong>Data:</strong> {{ match.date|date:"d M Y, H:i" }}</p>
+            
+            <h3>Obstaw wynik</h3>
+            <form method="POST">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-primary">Zapisz zakład</button>
+            </form>
+
+            {% if existing_bet %}
+            <p>Twój obecny typ: {{ existing_bet.home_score }} : {{ existing_bet.away_score }}</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
