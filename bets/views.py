@@ -1,7 +1,8 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .forms import BetForm, WinnerPredictionForm, TopScorerPredictionForm
-from .models import Match, Tournament, WinnerPrediction, TopScorerPrediction, Player, Bet
-from .utils import update_match_bets, calculate_final_results
+from .models import *
+from .utils import calculate_final_results
+from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 
 
@@ -130,17 +131,53 @@ def predict_top_scorer(request, tournament_id):
 
 def matches_list_view(request):
     # Pobieramy listę meczów
-    matches = Match.objects.all().order_by('date')
+    matches = Match.objects.filter(date__gt=timezone.now()).order_by('date')
+
+    # Filtrujemy mecze nadchodzące (te, które jeszcze się nie odbyły)
+    upcoming_matches = Match.objects.filter(date__gt=timezone.now()).order_by('date')
+
+    # Filtrujemy mecze zakończone (te, które już się odbyły)
+    past_matches = Match.objects.filter(date__lte=timezone.now()).order_by('-date')
+
+    # Pobierz ranking użytkowników
+    user_rankings = UserRanking.objects.order_by('-points')  # Sortowanie według punktów
 
     # Renderujemy szablon z listą meczów
-    return render(request, 'matches_list.html', {'matches': matches})
+    return render(request, 'matches_list.html', {
+        'matches': matches,
+        'upcoming_matches': upcoming_matches,
+        'past_matches': past_matches,
+        'user_rankings': user_rankings
+    })
 
 
 def match_detail_view(request, match_id):
     match = get_object_or_404(Match, id=match_id)
 
+    # Sprawdzamy, czy mecz się już zakończył
+    match_finished = match.date <= timezone.now()
+
+    # Pobieramy typ użytkownika dla tego meczu (jeśli istnieje)
+    user_bet = None
+    user_points = None
+    if request.user.is_authenticated:
+        try:
+            user_bet = Bet.objects.get(match=match, user=request.user)
+            user_points = user_bet.points
+        except Bet.DoesNotExist:
+            pass
+
+    # Filtrujemy mecze nadchodzące (te, które jeszcze się nie odbyły)
+    upcoming_matches = Match.objects.filter(date__gt=timezone.now()).order_by('date')
+
+    # Filtrujemy mecze zakończone (te, które już się odbyły)
+    past_matches = Match.objects.filter(date__lte=timezone.now()).order_by('-date')
+
     # Sprawdzenie, czy użytkownik już obstawił ten mecz
     existing_bet = Bet.objects.filter(user=request.user, match=match).first()
+
+    # Pobierz ranking użytkowników
+    user_rankings = UserRanking.objects.order_by('-points')  # Sortowanie według punktów
 
     if request.method == 'POST':
         form = BetForm(request.POST)
@@ -156,10 +193,12 @@ def match_detail_view(request, match_id):
                     user=request.user,
                     match=match,
                     home_score=form.cleaned_data['home_score'],
-                    away_score=form.cleaned_data['away_score']
+                    away_score=form.cleaned_data['away_score'],
+                    points=0
                 )
             return redirect('match_detail', match_id=match.id)
-
+        else:
+            print(form.errors)
     else:
         if existing_bet:
             form = BetForm(initial={
@@ -171,6 +210,12 @@ def match_detail_view(request, match_id):
 
     return render(request, 'match_detail.html', {
         'match': match,
+        'match_finished': match_finished,
+        'user_bet': user_bet,
+        'user_points': user_points,
+        'upcoming_matches': upcoming_matches,
+        'past_matches': past_matches,
         'form': form,
-        'existing_bet': existing_bet
+        'existing_bet': existing_bet,
+        'user_rankings': user_rankings
     })

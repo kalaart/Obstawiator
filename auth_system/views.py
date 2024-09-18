@@ -6,7 +6,7 @@ from django.contrib import auth
 from django.views import View
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-
+from bets.models import UserRanking
 
 def home(request):
     context = {}
@@ -38,6 +38,7 @@ def signup_page(request):
                 user = User.objects.create_user(request.POST['username'], password=request.POST['password1'])
                 # Automatic login after signing up
                 auth.login(request, user)
+                UserRanking.objects.create(user=user)
                 # Go to home page
                 return redirect('home')
     else:

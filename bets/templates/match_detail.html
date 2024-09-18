@@ -3,10 +3,11 @@
 {% block content %}
 <div class="row">
     <!-- Sidebar with match list (mecze) - powinno być po lewej stronie na komputerze -->
-    <div class="col-md-4 order-1 order-md-0 bg-light" style="min-height: 100vh;">
-        <h4 class="pt-4">Mecze</h4>
-        <ul class="list-group">
-            {% for m in matches %}
+    <div class="col-md-3 order-1 order-md-0 bg-light" style="min-height: 100vh;">
+        <!-- Nadchodzące mecze -->
+        <h4 class="pt-4">Nadchodzące Mecze</h4>
+        <ul class="list-group mb-4">
+            {% for m in upcoming_matches %}
             <li class="list-group-item">
                 <a href="{% url 'match_detail' m.id %}">
                     <strong>{{ m.home_team.name }}</strong> vs <strong>{{ m.away_team.name }}</strong><br>
@@ -14,28 +15,80 @@
                 </a>
             </li>
             {% empty %}
-            <li class="list-group-item">Brak dostępnych meczów</li>
+            <li class="list-group-item">Brak nadchodzących meczów</li>
+            {% endfor %}
+        </ul>
+
+        <!-- Zakończone mecze -->
+        <h4 class="pt-4">Ostatnio Rozegrane Mecze</h4>
+        <ul class="list-group">
+            {% for m in past_matches %}
+            <li class="list-group-item">
+                <a href="{% url 'match_detail' m.id %}">
+                    <strong>{{ m.home_team.name }}</strong> vs <strong>{{ m.away_team.name }}</strong><br>
+                    <small>{{ m.date|date:"d M Y, H:i" }}</small>
+                    <!-- Wyświetlenie wyniku, jeśli istnieje -->
+                    <br>
+                    <strong>Wynik: </strong> {{ m.home_score }} : {{ m.away_score }}
+                </a>
+            </li>
+            {% empty %}
+            <li class="list-group-item">Brak zakończonych meczów</li>
             {% endfor %}
         </ul>
     </div>
 
     <!-- Main content area (zakłady, typowanie wyniku) - powinno być po prawej stronie na komputerze -->
-    <div class="col-md-8 order-0 order-md-1">
+    <div class="col-md-6">
         <div class="content p-4">
             <h2>{{ match.home_team.name }} vs {{ match.away_team.name }}</h2>
             <p><strong>Data:</strong> {{ match.date|date:"d M Y, H:i" }}</p>
+            {% if match_finished %}
+                <!-- Jeśli mecz jest zakończony, wyświetl wynik i zakład użytkownika -->
+                <h3>Wynik meczu</h3>
+                <p><strong>{{ match.home_team.name }} {{ match.home_score }} : {{ match.away_score }} {{ match.away_team.name }}</strong></p>
 
-            <h3>Obstaw wynik</h3>
-            <form method="POST">
-                {% csrf_token %}
-                {{ form.as_p }}
-                <button type="submit" class="btn btn-primary">Zapisz zakład</button>
-            </form>
+                {% if user_bet %}
+                    <h3>Twój typ</h3>
+                    <p><strong>{{ user_bet.home_score }} : {{ user_bet.away_score }}</strong></p>
+                    <h4>Zdobyte punkty: {{ user_points }}</h4>
+                {% else %}
+                    <p>Nie obstawiałeś tego meczu.</p>
+                {% endif %}
+            {% else %}
+                <!-- Jeśli mecz się jeszcze nie odbył, wyświetl formularz obstawiania -->
+                <h3>Obstaw wynik</h3>
+                <form method="POST">
+                    {% csrf_token %}
+                    {{ form.as_p }}
 
-            {% if existing_bet %}
-            <p>Twój obecny typ: {{ existing_bet.home_score }} : {{ existing_bet.away_score }}</p>
+                    {% if existing_bet %}
+                        <button type="submit" class="btn btn-primary">Zaktualizuj zakład</button>
+                    {% else %}
+                        <button type="submit" class="btn btn-primary">Zapisz zakład</button>
+                    {% endif %}
+                </form>
+
+                {% if existing_bet %}
+                <p>Twój obecny typ: {{ existing_bet.home_score }} : {{ existing_bet.away_score }}</p>
+                {% endif %}
             {% endif %}
         </div>
     </div>
+
+    <div class="row mt-4">
+        <!-- Prawy panel z rankingiem użytkowników -->
+        <div class="col-md-12">
+            <h2>User Rankings</h2>
+            <ul class="list-group">
+                {% for ranking in user_rankings %}
+                    <li class="list-group-item">
+                        {{ ranking.user.username }} - {{ ranking.points }} points
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
 </div>
 {% endblock %}

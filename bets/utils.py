@@ -1,44 +1,4 @@
-from .models import *
-
-def update_match_bets(match):
-    tournament = match.tournament
-    bets = Bet.objects.filter(match=match)
-
-    for bet in bets:
-        # Znajdź lub stwórz rekord dla użytkownika w tabeli wyników turnieju
-        user_score, created = UserTournamentScore.objects.get_or_create(user=bet.user, tournament=tournament)
-
-        # 1. Punkty za dokładny wynik
-        if bet.home_score == match.home_score and bet.away_score == match.away_score:
-            user_score.points += tournament.points_for_exact_score
-
-        # 2. Punkty za poprawny bilans bramek
-        elif (bet.home_score - bet.away_score) == (match.home_score - match.away_score):
-            user_score.points += tournament.points_for_goal_difference
-
-        # 3. Punkty za poprawne wytypowanie zwycięzcy meczu
-        else:
-            match_winner = None
-            if match.home_score > match.away_score:
-                match_winner = "home"
-            elif match.home_score < match.away_score:
-                match_winner = "away"
-            else:
-                match_winner = "draw"
-
-            bet_winner = None
-            if bet.home_score > bet.away_score:
-                bet_winner = "home"
-            elif bet.home_score < bet.away_score:
-                bet_winner = "away"
-            else:
-                bet_winner = "draw"
-
-            if match_winner == bet_winner:
-                user_score.points += tournament.points_for_match_winner
-
-        # Zapisz zaktualizowaną punktację użytkownika
-        user_score.save()
+from .models import UserTournamentScore, WinnerPrediction, TopScorerPrediction
 
 
 def calculate_final_results(tournament):

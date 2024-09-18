@@ -55,6 +55,11 @@ class TopScorerPredictionForm(forms.Form):
         return cleaned_data
 
 
-class BetForm(forms.Form):
-    home_score = forms.IntegerField(label="Wynik gospodarzy", min_value=0)
-    away_score = forms.IntegerField(label="Wynik gości", min_value=0)
+class BetForm(forms.ModelForm):
+    class Meta:
+        model = Bet
+        fields = ['home_score', 'away_score']  # Dodajemy odpowiednie pola
+        widgets = {
+            'home_score': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Gole gospodarzy'}),
+            'away_score': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Gole gości'}),
+        }
