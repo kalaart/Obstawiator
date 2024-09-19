@@ -21,11 +21,12 @@ from bets import views as bets_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    #path('', include('bets.urls')),
+    path('', include('bets.urls')),
     #path('', bets_views.home, name='home'),
-    path('signup', auth_views.signup_page, name='signup_page'),
-    path('login/', auth_views.login_page, name='login_page'),
-    path('logout', auth_views.logout_page, name='logout_page'),
-    path('', auth_views.home, name='home'),
-    path('', include('bets.urls'))
+    path('signup', auth_views.signup_page, name='signup'),
+    path('login/', auth_views.login_page, name='login'),
+    path('logout', auth_views.logout_page, name='logout'),
+    #path('', auth_views.home, name='home'),
+    #path('', include('bets.urls'))
+    path('', bets_views.home, name='home'),
 ]

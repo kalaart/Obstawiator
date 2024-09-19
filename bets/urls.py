@@ -22,4 +22,13 @@ urlpatterns = [
 
     # Zakończenie turnieju (podliczenie punktów za mistrza i króla strzelców)
     path('tournament/<int:tournament_id>/finalize/', bets_views.finalize_tournament, name='finalize_tournament'),
+
+    # Statystyki
+    path('statistics', bets_views.home, name='statistics'),
+
+    # Zakłady dla danego turnieju
+    path('bets/<int:tournament_id>/', bets_views.bets, name='bets'),
+
+    # Terminarz danego turnieju
+    path('schedule/<int:tournament_id>/', bets_views.schedule, name='schedule'),
 ]

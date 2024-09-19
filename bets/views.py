@@ -219,3 +219,28 @@ def match_detail_view(request, match_id):
         'existing_bet': existing_bet,
         'user_rankings': user_rankings
     })
+
+
+def home(request):
+    tournaments = Tournament.objects.all()
+    print(tournaments)
+    # Filtrujemy mecze nadchodzące (te, które jeszcze się nie odbyły)
+    upcoming_matches = Match.objects.filter(date__gt=timezone.now()).order_by('date')[:3]
+    #upcoming_matches = Match.objects.order_by('date')[:3]
+    # Pobierz ranking użytkowników
+    user_rankings = UserRanking.objects.order_by('-points')[:7]  # Sortowanie według punktów
+    missing_count = 7 - user_rankings.count()
+    return render(request, 'home.html', {
+        'tournaments': tournaments,
+        'upcoming_matches': upcoming_matches,
+        'user_rankings': user_rankings,
+        'missing_count': missing_count
+    })
+
+
+def bets(request, tournament_id):
+    return home(request)
+
+
+def schedule(request, tournament_id):
+    return home(request)
