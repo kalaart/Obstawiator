@@ -225,16 +225,27 @@ def home(request):
     tournaments = Tournament.objects.all()
     print(tournaments)
     # Filtrujemy mecze nadchodzące (te, które jeszcze się nie odbyły)
-    upcoming_matches = Match.objects.filter(date__gt=timezone.now()).order_by('date')[:3]
-    #upcoming_matches = Match.objects.order_by('date')[:3]
+    upcoming_matches = Match.objects.filter(date__date=timezone.now().date()).order_by('date')
+
     # Pobierz ranking użytkowników
-    user_rankings = UserRanking.objects.order_by('-points')[:7]  # Sortowanie według punktów
-    missing_count = 7 - user_rankings.count()
+    user_rankings = UserRanking.objects.order_by('-points')[:10]  # Sortowanie według punktów
+    missing_count = 10 - user_rankings.count()
+
+    bet_forms = [BetForm(home_team_name=match.home_team.name,
+                         away_team_name=match.away_team.name) for match in upcoming_matches]
+
+    bet_forms_matches = zip(upcoming_matches, bet_forms)
+
+    # Filtrujemy mecze zakończone (te, które już się odbyły)
+    past_matches = Match.objects.filter(date__lte=timezone.now()).order_by('-date')[:5]
+
     return render(request, 'home.html', {
         'tournaments': tournaments,
         'upcoming_matches': upcoming_matches,
         'user_rankings': user_rankings,
-        'missing_count': missing_count
+        'missing_count': missing_count,
+        'bet_forms_matches': bet_forms_matches,
+        'past_matches': past_matches
     })
 
 

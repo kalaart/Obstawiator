@@ -1,64 +1,103 @@
 {% extends 'base.html' %}
-{% block content %}
-      <div class="container-fluid bg-secondary p-0">
-        <div class="row g-0 d-flex h-100">
-            <div class="col-lg-3 py-0 vh-100 px-5">
-                <div class="h-100 d-flex flex-column justify-content-center bg-primary p-5">
-                    {% for m in upcoming_matches %}
+    {% block content %}
+    <div class="container-fluid bg-secondary p-0">
+        <div class="row g-0 d-flex align-items-stretch">
+
+            <!-- Lewy panel -->
+            <div class="col-lg-3 py-0 px-5 d-flex">
+                <div class="flex-grow-1 d-flex flex-column bg-primary p-5">
+                    <h2 class="display-5 mb-0 text-center">Wyniki:</h2>
+                    <hr class="w-100 mx-auto bg-secondary">
+                    <br>
+                    {% for m in past_matches %}
                         <div class="d-flex text-white mb-0">
                             <div class="ps-4">
-                                <a href=""><h3>{{ m.home_team.name }} <br> {{ m.away_team.name }}</h3></a>
+                                <a href=""><h3>{{ m.home_team.name }}: {{ m.home_score }} <br>
+                                    {{ m.away_team.name }}: {{ m.away_score }}</h3></a>
                                 <p class="mb-0">{{ m.date|date:"d M Y, H:i" }}</p><br>
                             </div>
                         </div>
+                        <hr class="w-100 mx-auto bg-secondary">
                     {% endfor %}
 
                     <a href="" class="btn btn-light py-md-3 px-md-5 rounded-pill mb-2">Więcej</a>
                 </div>
             </div>
 
-            <div class="col-lg-6 vh-100">
-                <div class="h-100 d-flex flex-column justify-content-center bg-primary p-5">
+            <!-- Środkowy panel -->
+            <div class="col-lg-6 d-flex flex-grow-1">
+                <div class="d-flex flex-column bg-primary p-5 flex-grow-1">
+                    <h2 class="display-5 mb-0 text-center">Dzisiejsze mecze:</h2>
+
+                    {% for m, form in bet_forms_matches %}
+                        <div class="bg-light p-3 rounded shadow-sm mb-2">
+                            <!-- Data i czas rozpoczęcia meczu -->
+                            <div class="d-flex justify-content-between">
+                                <p class="mb-0">{{ m.date|date:"d M Y, H:i" }} {{ m.home_team.name }} vs {{ m.away_team.name }}</p><br>
+                            </div>
+                            <hr>
+
+                            <div class="row align-items-center">
+                                <form method="POST" class="post-form">
+                                    {% csrf_token %}
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="{{ form.home_score.id_for_label }}" class="form-label">{{ form.home_score.label }}</label>
+                                                {{ form.home_score }}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="{{ form.away_score.id_for_label }}" class="form-label">{{ form.away_score.label }}</label>
+                                                {{ form.away_score }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary mt-1">Zapisz</button>
+                                </form>
+                            </div>
+                        </div>
+                    {% endfor %}
 
                 </div>
             </div>
 
-            <div class="col lg-3 vh-100">
-                <div class="h-100 d-flex flex-column justify-content-center bg-secondary p-5">
-                <h2 class="display-5 mb-0 text-center">Ranking</h2>
-                <table class="table">
-                  <thead>
-                    <tr>
-                      <th scope="col">#</th>
-                      <th scope="col">Gracz</th>
-                      <th scope="col">Punkty</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {% for r in user_rankings %}
-                        <tr>
-                          <th scope="row">{{ forloop.counter }}</th>
-                          <td>{{ r.user.username }}</td>
-                          <td>{{ r.points }}</td>
-                        </tr>
-                    {% endfor %}
+            <!-- Prawy panel -->
+            <div class="col-lg-3 d-flex">
+                <div class="flex-grow-1 d-flex flex-column bg-secondary p-5">
+                    <h2 class="display-5 mb-0 text-center">Ranking</h2>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Gracz</th>
+                                <th scope="col">Punkty</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for r in user_rankings %}
+                                <tr>
+                                    <th scope="row">{{ forloop.counter }}</th>
+                                    <td>{{ r.user.username }}</td>
+                                    <td>{{ r.points }}</td>
+                                </tr>
+                            {% endfor %}
 
-                    {% for i in " "|ljust:missing_count %}
-                        <tr>
-                            <th scope="row">{{ forloop.counter|add:user_rankings.count }}</th> <!-- Numer pozycji -->
-                            <td>-</td> <!-- Pusty gracz -->
-                            <td>-</td> <!-- Puste punkty -->
-                        </tr>
-                    {% endfor %}
-                  </tbody>
-                </table>
+                            {% for i in " "|ljust:missing_count %}
+                                <tr>
+                                    <th scope="row">{{ forloop.counter|add:user_rankings.count }}</th> <!-- Numer pozycji -->
+                                    <td>-</td> <!-- Pusty gracz -->
+                                    <td>-</td> <!-- Puste punkty -->
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
 
                     <div class="container d-flex justify-content-center align-items-center">
-    <a href="" class="btn btn-primary py-md-3 px-md-5 me-3 rounded-pill p-4">Więcej</a>
-</div>
-
-
-            </div>
+                        <a href="" class="btn btn-primary py-md-3 px-md-5 me-3 rounded-pill p-4">Więcej</a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

@@ -58,8 +58,15 @@ class TopScorerPredictionForm(forms.Form):
 class BetForm(forms.ModelForm):
     class Meta:
         model = Bet
-        fields = ['home_score', 'away_score']  # Dodajemy odpowiednie pola
+        fields = ['home_score', 'away_score']
         widgets = {
             'home_score': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Gole gospodarzy'}),
             'away_score': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Gole gości'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        home_team_name = kwargs.pop('home_team_name', 'Drużyna A')
+        away_team_name = kwargs.pop('away_team_name', 'Drużyna B')
+        super(BetForm, self).__init__(*args, **kwargs)
+        self.fields['home_score'].label = home_team_name
+        self.fields['away_score'].label = away_team_name
